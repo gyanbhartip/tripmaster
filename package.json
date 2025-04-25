@@ -1,31 +1,35 @@
 {
-  "name": "tripmaster",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
-  },
-  "dependencies": {
-    "@react-router/node": "^7.5.2",
-    "@react-router/serve": "^7.5.2",
-    "isbot": "^5.1.17",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router": "^7.5.2"
-  },
-  "devDependencies": {
-    "@react-router/dev": "^7.5.2",
-    "@tailwindcss/vite": "^4.0.0",
-    "@types/node": "^20",
-    "@types/react": "^19.0.1",
-    "@types/react-dom": "^19.0.1",
-    "react-router-devtools": "^1.1.0",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^5.4.11",
-    "vite-tsconfig-paths": "^5.1.4"
-  }
+    "name": "tripmaster",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "react-router build",
+        "dev": "react-router dev",
+        "start": "react-router-serve ./build/server/index.js",
+        "typecheck": "react-router typegen && tsc",
+        "deps:update": "bunx npm-check-updates --root --format group -i"
+    },
+    "dependencies": {
+        "@react-router/node": "^7.5.2",
+        "@react-router/serve": "^7.5.2",
+        "@sentry/react": "^9.14.0",
+        "clsx": "^2.1.1",
+        "isbot": "^5.1.27",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-router": "^7.5.2",
+        "tailwind-merge": "^3.2.0"
+    },
+    "devDependencies": {
+        "@react-router/dev": "^7.5.2",
+        "@tailwindcss/vite": "^4.1.4",
+        "@types/node": "^22",
+        "@types/react": "^19.1.2",
+        "@types/react-dom": "^19.1.2",
+        "react-router-devtools": "^1.1.10",
+        "tailwindcss": "^4.1.4",
+        "typescript": "^5.8.3",
+        "vite": "^6.3.3",
+        "vite-tsconfig-paths": "^5.1.4"
+    }
 }
