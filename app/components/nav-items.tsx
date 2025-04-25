@@ -1,12 +1,6 @@
-import { sidebarItems } from '@/constants';
+import { TESTUSER, sidebarItems } from '@/constants';
 import { cn } from '@/lib/utils';
 import { Link, NavLink } from 'react-router';
-
-const user = {
-    name: 'Test User',
-    email: 'test@mail.com',
-    imageUrl: '/assets/images/david.webp',
-};
 
 type Props = {
     handleClick: () => void;
@@ -50,12 +44,12 @@ const NavItems = ({ handleClick }: Props) => {
                 </nav>
                 <footer className="nav-footer">
                     <img
-                        src={user?.imageUrl || '/assets/images/david.webp'}
-                        alt={user?.name || 'User Photo'}
+                        src={TESTUSER?.imageUrl || '/assets/images/david.webp'}
+                        alt={TESTUSER?.name || 'User Photo'}
                     />
                     <article>
-                        <h2>{user?.name}</h2>
-                        <p>{user?.email}</p>
+                        <h2>{TESTUSER?.name}</h2>
+                        <p>{TESTUSER?.email}</p>
                     </article>
                     <button
                         onClick={() => {
