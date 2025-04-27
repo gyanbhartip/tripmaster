@@ -6,7 +6,11 @@ const { databaseId, userCollectionId } = appwriteConfig;
 
 export const loginWithGoogle = async () => {
     try {
-        account.createOAuth2Session(OAuthProvider.Google);
+        account.createOAuth2Session(
+            OAuthProvider.Google,
+            `${window.location.origin}/`,
+            `${window.location.origin}/404`,
+        );
     } catch (error) {
         console.error('Error during OAuth2 session creation: ', error);
     }
@@ -15,7 +19,6 @@ export const loginWithGoogle = async () => {
 export const logoutUser = async () => {
     try {
         await account.deleteSession('current');
-        return true;
     } catch (error) {
         console.error('Error during logout: ', error);
     }
@@ -23,15 +26,16 @@ export const logoutUser = async () => {
 
 export const getUser = async () => {
     try {
-        const user = account.get();
+        const user = await account.get();
         if (!user) {
             return redirect('/sign-in');
         }
+
         const { documents } = await database.listDocuments(
             databaseId,
             userCollectionId,
             [
-                Query.equal('accountId', (await user).$id),
+                Query.equal('accountId', user.$id),
                 Query.select([
                     'name',
                     'email',
@@ -41,6 +45,7 @@ export const getUser = async () => {
                 ]),
             ],
         );
+
         return documents.length > 0 ? documents[0] : redirect('/sign-in');
     } catch (error) {
         console.error('Error fetching user: ', error);
@@ -48,35 +53,18 @@ export const getUser = async () => {
     }
 };
 
-export const getGooglePicture = async () => {
+export const getGooglePicture = async (accessToken: string) => {
     try {
-        const session = await account.getSession('current');
-        const OAuthToken = session.providerAccessToken;
-        if (!OAuthToken) {
-            console.warn('No OAuth token available');
-            return null;
-        }
         const response = await fetch(
             'https://people.googleapis.com/v1/people/me?personFields=photos',
-            {
-                headers: {
-                    Authorization: `Bearer ${OAuthToken}`,
-                },
-            },
+            { headers: { Authorization: `Bearer ${accessToken}` } },
         );
-
         if (!response.ok) {
-            console.warn(
-                'Failed to fetch profile photo from Google People API',
-            );
-            return null;
+            throw new Error('Failed to fetch Google profile picture');
         }
-        const data = await response.json();
 
-        const photoUrl =
-            data?.photos?.length > 0 ? (data.photos[0].url as string) : null;
-
-        return photoUrl;
+        const { photos } = await response.json();
+        return photos?.[0]?.url || null;
     } catch (error) {
         console.error('Error fetching Google picture: ', error);
         return null;
@@ -86,19 +74,15 @@ export const getGooglePicture = async () => {
 export const storeUserData = async () => {
     try {
         const user = await account.get();
+        if (!user) throw new Error('User not found');
 
-        const { documents } = await database.listDocuments(
-            databaseId,
-            userCollectionId,
-            [Query.equal('accountId', user.$id)],
-        );
-        if (documents.length > 0) {
-            return documents[0];
-        }
+        const { providerAccessToken } =
+            (await account.getSession('current')) || {};
+        const profilePicture = providerAccessToken
+            ? await getGooglePicture(providerAccessToken)
+            : null;
 
-        const imageUrl = await getGooglePicture();
-
-        const newUser = await database.createDocument(
+        const createdUser = await database.createDocument(
             databaseId,
             userCollectionId,
             ID.unique(),
@@ -106,12 +90,14 @@ export const storeUserData = async () => {
                 accountId: user.$id,
                 email: user.email,
                 name: user.name,
-                imageUrl: imageUrl || '',
+                imageUrl: profilePicture,
                 joinedAt: new Date().toISOString(),
             },
         );
 
-        return newUser;
+        if (!createdUser.$id) {
+            redirect('/sign-in');
+        }
     } catch (error) {
         console.error('Error storing user data: ', error);
     }
