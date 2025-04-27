@@ -115,3 +115,23 @@ export const getExistingUser = async (id: string) => {
         console.error('Error fetching user: ', error);
     }
 };
+
+export const getAllUsers = async (limit: number, offset: number) => {
+    try {
+        const { documents: users, total } = await database.listDocuments(
+            databaseId,
+            userCollectionId,
+            [Query.limit(limit), Query.offset(offset)],
+        );
+        return {
+            total,
+            users: total < 1 ? {} : users,
+        };
+    } catch (error) {
+        console.error('Error fetching users: ', error);
+        return {
+            total: 0,
+            users: [],
+        };
+    }
+};
