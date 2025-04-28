@@ -125,7 +125,7 @@ export const getAllUsers = async (limit: number, offset: number) => {
         );
         return {
             total,
-            users: total < 1 ? {} : users,
+            users: total < 1 ? [] : users,
         };
     } catch (error) {
         console.error('Error fetching users: ', error);
