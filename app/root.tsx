@@ -40,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     name="description"
                     content="An AI powered trip planning application."
                 />
+                {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" /> */}
                 <Meta />
                 <Links />
             </head>
