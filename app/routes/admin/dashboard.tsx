@@ -14,6 +14,7 @@ import {
     ColumnSeries,
     DataLabel,
     Inject,
+    Legend,
     SeriesCollectionDirective,
     SeriesDirective,
     SplineAreaSeries,
@@ -174,6 +175,7 @@ const Dashboard = ({
                             Category,
                             DataLabel,
                             Tooltip,
+                            Legend,
                         ]}
                     />
                     <SeriesCollectionDirective>
@@ -213,6 +215,7 @@ const Dashboard = ({
                             Category,
                             DataLabel,
                             Tooltip,
+                            Legend,
                         ]}
                     />
                     <SeriesCollectionDirective>
