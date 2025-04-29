@@ -38,7 +38,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
         const imageUrls = (await imageResponse.json()).results
             .slice(0, 3)
-            .map(result => result.urls?.regular || null);
+            .map(
+                result =>
+                    result.urls?.regular.replace('fm=jpg', 'fm=webp') || null,
+            );
 
         const result = await database.createDocument(
             appwriteConfig.databaseId,
