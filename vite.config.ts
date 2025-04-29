@@ -24,6 +24,9 @@ export default defineConfig(config => ({
     ssr: {
         noExternal: [/@syncfusion/],
     },
+    build: {
+        ssr: true,
+    },
     //added to mitigate https://github.com/remix-run/react-router/issues/12568
     resolve:
         config.command === 'build'
