@@ -1,0 +1,27 @@
+services:
+    tripmaster:
+        build:
+            context: .
+        container_name: tripmaster
+        expose:
+            - '3000'
+        networks:
+            - app-net
+
+    nginx:
+        build:
+            context: ./docker/nginx
+        container_name: nginx
+        ports:
+            - '8080:80'
+        volumes:
+            - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+        depends_on:
+            - tripmaster
+        networks:
+            - app-net
+
+networks:
+    app-net:
+        driver: bridge
