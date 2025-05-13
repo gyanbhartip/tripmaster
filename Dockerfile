@@ -1,22 +1,38 @@
-FROM oven/bun:1.2.10 AS development-dependencies-env
-COPY . /app
+# Base stage for development dependencies
+FROM oven/bun:alpine AS deps
 WORKDIR /app
+# Copy only package files first to leverage Docker cache
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-FROM oven/bun:1.2.10 AS production-dependencies-env
-COPY ./package.json bun.lock /app/
+# Development stage with all dependencies
+FROM oven/bun:alpine AS dev-deps
 WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+# Production dependencies stage
+FROM oven/bun:alpine AS prod-deps
+WORKDIR /app
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --omit=dev
 
-FROM oven/bun:1.2.10 AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
+# Build stage
+FROM oven/bun:alpine AS builder
 WORKDIR /app
+COPY --from=dev-deps /app/node_modules ./node_modules
+COPY . .
 RUN bun run build
 
-FROM oven/bun:1.2.10
-COPY ./package.json bun.lock /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+# Final production image
+FROM oven/bun:alpine
 WORKDIR /app
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=builder /app/build ./build
+COPY package.json bun.lock ./
+
+# Set production environment
+ENV NODE_ENV=production
+
 CMD ["bun", "run", "start"]
